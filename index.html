@@ -152,6 +152,9 @@
     box-shadow: 0 0 28px rgba(201,162,75,0.45), 0 10px 34px rgba(0,0,0,0.4);
     transform: translateY(-2px) scale(1.03);
   }
+  .btn-yes.mega{
+    box-shadow: 0 0 45px rgba(201,162,75,0.65), 0 10px 40px rgba(0,0,0,0.45);
+  }
 
   .btn-no{
     background: transparent;
@@ -167,6 +170,11 @@
     position: fixed;
     z-index: 30;
   }
+  .btn-no.decoy{
+    font-size: 0.85rem;
+    padding: 0.7em 1.6em;
+    opacity: 0.85;
+  }
 
   .card{
     position:relative;
@@ -181,78 +189,143 @@
     width: 100%;
   }
 
-  .status-card{
-    margin-top: 2.4rem;
-    display:inline-flex;
-    flex-direction:column;
-    gap:0.35rem;
-    padding: 1.1rem 2rem;
-    border-radius: 12px;
-    border: 1px solid rgba(201,162,75,0.35);
-    background: rgba(201,162,75,0.06);
+  /* ---------- teddy bear ---------- */
+  .teddy-wrap{
+    position:absolute;
+    bottom:-26px;
+    right:-22px;
+    width:92px; height:92px;
+    z-index:15;
+    transform-origin: 70% 90%;
+    transition: transform 0.35s ease;
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.45));
   }
-  .status-label{
-    font-size: 0.7rem;
-    letter-spacing: 0.22em;
+  .teddy-wrap.shake{ animation: teddyShake 0.5s ease; }
+  @keyframes teddyShake{
+    0%,100%{ transform: rotate(0deg); }
+    20%{ transform: rotate(-9deg); }
+    40%{ transform: rotate(7deg); }
+    60%{ transform: rotate(-5deg); }
+    80%{ transform: rotate(3deg); }
+  }
+  .teddy-bubble{
+    position:absolute;
+    bottom: 100%;
+    right: 6px;
+    margin-bottom: 10px;
+    background: rgba(20,14,11,0.9);
+    border: 1px solid rgba(201,162,75,0.4);
     color: var(--gold-light);
-    opacity: 0.85;
-  }
-  .status-value{
     font-family: var(--serif);
     font-style: italic;
-    font-size: 1.25rem;
-    color: var(--ivory);
+    font-size: 0.82rem;
+    padding: 0.5em 0.9em;
+    border-radius: 12px;
+    white-space: nowrap;
+    opacity:0;
+    transform: translateY(6px) scale(0.9);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events:none;
+  }
+  .teddy-bubble.show{ opacity:1; transform: translateY(0) scale(1); }
+  @media (max-width: 560px){
+    .teddy-wrap{ width:68px; height:68px; bottom:-18px; right:-10px; }
+    .teddy-bubble{ font-size:0.72rem; right:-4px; }
   }
 
-  .yes-heading{
+  /* ---------- calendar ---------- */
+  .cal-card{ max-width: 480px; }
+  .cal-month{
     font-family: var(--serif);
-    font-size: clamp(1.9rem, 5vw, 3.2rem);
-    line-height:1.2;
-    max-width: 15ch;
-    opacity:0; transform: translateY(16px);
-    transition: opacity 1.1s cubic-bezier(.19,1,.22,1) 0.3s, transform 1.1s cubic-bezier(.19,1,.22,1) 0.3s;
+    font-style: italic;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    color: var(--ivory);
+    margin: 0 0 0.3rem;
   }
-  .scene.active .yes-heading{ opacity:1; transform:translateY(0); }
-
-  .yes-sub{
+  .cal-sub{
     font-family: var(--sans);
     color: var(--ivory-dim);
-    margin-top: 1rem;
-    font-size: 1rem;
-    opacity:0; transform: translateY(10px);
-    transition: opacity 1.1s cubic-bezier(.19,1,.22,1) 0.6s, transform 1.1s cubic-bezier(.19,1,.22,1) 0.6s;
-  }
-  .scene.active .yes-sub{ opacity:1; transform:translateY(0); }
-
-  .final-line{
-    margin-top: 1.6rem;
-    font-family: var(--serif);
-    font-style: italic;
-    color: var(--gold-light);
-    font-size: 1.15rem;
-    opacity:0;
-    max-height:0;
-    overflow:hidden;
-    transition: opacity 0.9s ease, max-height 0.9s ease;
-  }
-  .final-line.show{ opacity:1; max-height: 4em; }
-
-  .picker-btn{
-    margin-top: 2.2rem;
-    background: transparent;
-    border: 1px solid rgba(201,162,75,0.45);
-    color: var(--gold-light);
-    font-family: var(--sans);
     font-size: 0.92rem;
-    letter-spacing: 0.03em;
-    padding: 0.8em 1.8em;
-    border-radius: 999px;
-    cursor:pointer;
-    transition: background 0.4s ease, color 0.4s ease, transform 0.4s ease;
-    opacity:0; transform: translateY(10px);
+    margin: 0 0 1.8rem;
   }
-  .scene.active .picker-btn{ opacity:1; transform:translateY(0); transition-delay: 0.9s, 0.9s, 0s; }
-  .picker-btn:hover{ background: rgba(201,162,75,0.14); transform: translateY(-2px); }
+  .cal-grid{
+    display:grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+  .cal-head{
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    color: var(--gold-light);
+    opacity:0.7;
+    padding-bottom: 6px;
+  }
+  .cal-day{
+    aspect-ratio: 1;
+    display:flex; align-items:center; justify-content:center;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ivory-dim);
+  }
+  .cal-day.empty{ visibility:hidden; }
+  .cal-day.off{
+    color: rgba(201,189,168,0.28);
+    cursor: not-allowed;
+  }
+  .cal-day.special{
+    cursor:pointer;
+    color: var(--bg-0);
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    border-color: rgba(201,162,75,0.9);
+    font-weight:700;
+    box-shadow: 0 0 0 rgba(201,162,75,0.5);
+    animation: calPulse 1.8s ease-in-out infinite;
+  }
+  .cal-day.special:hover{ transform: scale(1.12); }
+  @keyframes calPulse{
+    0%,100%{ box-shadow: 0 0 8px rgba(201,162,75,0.35); }
+    50%{ box-shadow: 0 0 22px rgba(201,162,75,0.75); }
+  }
+
+  /* ---------- final scene ---------- */
+  .final-heading{
+    font-family: var(--serif);
+    font-size: clamp(1.7rem, 4.6vw, 2.7rem);
+    line-height:1.25;
+    max-width: 16ch;
+    color: var(--gold-light);
+    opacity:0; transform: translateY(14px);
+    transition: opacity 1s cubic-bezier(.19,1,.22,1) 0.2s, transform 1s cubic-bezier(.19,1,.22,1) 0.2s;
+  }
+  .scene.active .final-heading{ opacity:1; transform:translateY(0); }
+  .final-sub{
+    font-family: var(--sans);
+    color: var(--ivory-dim);
+    margin-top: 0.9rem;
+    font-size: 0.95rem;
+  }
+  .countdown{
+    margin-top: 2rem;
+    width: 74px; height:74px;
+    border-radius:50%;
+    border: 1px solid rgba(201,162,75,0.5);
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    color: var(--ivory);
+    background: rgba(201,162,75,0.08);
+  }
+  .redirect-note{
+    margin-top: 1rem;
+    font-size: 0.78rem;
+    color: var(--ivory-dim);
+    opacity:0.75;
+  }
+  .redirect-note a{ color: var(--gold-light); }
 
   /* custom cursor */
   .cursor-dot, .cursor-ring{
@@ -285,6 +358,7 @@
     .card{ padding: 2rem 1.4rem; }
     .buttons-row{ gap: 1rem; }
     .btn{ padding: 0.9em 1.7em; font-size:0.95rem; }
+    .cal-day{ font-size:0.78rem; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -312,7 +386,7 @@
   </section>
 
   <section class="scene" id="scene-question">
-    <div class="card">
+    <div class="card" id="questionCard">
       <div class="eyebrow">a question</div>
       <h1 class="question-main" id="mainQuestion">Would you go on a date with me?</h1>
       <p class="support-line" id="supportLine">&nbsp;</p>
@@ -320,20 +394,45 @@
         <button class="btn btn-yes" id="yesBtn">YES</button>
         <button class="btn btn-no" id="noBtn">NO</button>
       </div>
+      <div class="teddy-wrap" id="teddyWrap">
+        <div class="teddy-bubble" id="teddyBubble">please?</div>
+        <svg viewBox="0 0 100 100" width="100%" height="100%">
+          <ellipse cx="50" cy="78" rx="30" ry="20" fill="#7c2233"/>
+          <circle cx="24" cy="60" r="11" fill="#c9a24b"/>
+          <circle cx="76" cy="60" r="11" fill="#c9a24b"/>
+          <circle cx="50" cy="42" r="26" fill="#c9a24b"/>
+          <circle cx="30" cy="24" r="10" fill="#c9a24b"/>
+          <circle cx="70" cy="24" r="10" fill="#c9a24b"/>
+          <circle cx="30" cy="24" r="4.5" fill="#54121e"/>
+          <circle cx="70" cy="24" r="4.5" fill="#54121e"/>
+          <ellipse cx="50" cy="47" rx="10" ry="8" fill="#e8cb8f"/>
+          <circle cx="43" cy="39" r="2.6" fill="#2a1a12"/>
+          <circle cx="57" cy="39" r="2.6" fill="#2a1a12"/>
+          <ellipse cx="50" cy="47" rx="3" ry="2.2" fill="#54121e"/>
+          <path d="M45 52 Q50 56 55 52" stroke="#54121e" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          <circle cx="14" cy="72" r="8" fill="#c9a24b"/>
+          <circle cx="86" cy="72" r="8" fill="#c9a24b"/>
+          <path d="M50 66 l-5 -6 q-6 -6 0 -11 q5 -3 5 4 q0 -7 5 -4 q6 5 0 11 z" fill="#c98d84"/>
+        </svg>
+      </div>
     </div>
   </section>
 
-  <section class="scene" id="scene-yes">
+  <section class="scene" id="scene-calendar">
+    <div class="card cal-card">
+      <div class="eyebrow">pick a date</div>
+      <h2 class="cal-month" id="calMonth">September</h2>
+      <p class="cal-sub">Only one day on here actually works for me&hellip;</p>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </section>
+
+  <section class="scene" id="scene-final">
     <div class="card" style="text-align:center;">
-      <h2 class="yes-heading">I was really hoping you&rsquo;d say yes.</h2>
-      <p class="yes-sub">Then it&rsquo;s officially a date.<br>Now all that&rsquo;s left is deciding where we&rsquo;re going.</p>
-      <div class="status-card">
-        <span class="status-label">DATE STATUS</span>
-        <span class="status-value">Confirmed</span>
-      </div>
-      <br>
-      <button class="picker-btn" id="pickerBtn">Okay, now pick a date</button>
-      <p class="final-line" id="finalLine">First things first&hellip; you owe me a date.</p>
+      <h2 class="final-heading">Great!!!! Let&rsquo;s meet at Onam at IISER Kolkata</h2>
+      <p class="final-sub">See you there.</p>
+      <div class="countdown" id="countdownNum">5</div>
+      <p class="redirect-note">Taking you there in a moment &mdash; or <a href="https://onam-coupons.vercel.app/" id="manualLink">tap here</a>.</p>
     </div>
   </section>
 
@@ -472,14 +571,15 @@
   var sceneIntro1 = document.getElementById('scene-intro1');
   var sceneIntro2 = document.getElementById('scene-intro2');
   var sceneQuestion = document.getElementById('scene-question');
-  var sceneYes = document.getElementById('scene-yes');
+  var sceneCalendar = document.getElementById('scene-calendar');
+  var sceneFinal = document.getElementById('scene-final');
   var intro1a = document.getElementById('intro1a');
   var intro2a = document.getElementById('intro2a');
 
+  var ALL_SCENES = [sceneIntro1, sceneIntro2, sceneQuestion, sceneCalendar, sceneFinal];
+
   function activate(scene){
-    [sceneIntro1, sceneIntro2, sceneQuestion, sceneYes].forEach(function(s){
-      s.classList.remove('active');
-    });
+    ALL_SCENES.forEach(function(s){ s.classList.remove('active'); });
     scene.classList.add('active');
   }
 
@@ -495,7 +595,9 @@
   var noBtn = document.getElementById('noBtn');
   var buttonsRow = document.getElementById('buttonsRow');
   var supportLine = document.getElementById('supportLine');
-  var card = document.querySelector('#scene-question .card');
+  var card = document.getElementById('questionCard');
+  var teddyWrap = document.getElementById('teddyWrap');
+  var teddyBubble = document.getElementById('teddyBubble');
 
   var noMessages = [
     "",
@@ -505,21 +607,59 @@
     "Really sure?",
     "You\u2019re making me work for this.",
     "Okay, but I\u2019m still asking nicely.",
-    "Last chance\u2026 maybe?"
+    "The teddy bear is judging you right now.",
+    "Last chance\u2026 maybe?",
+    "Bold of you to keep going.",
+    "I respect the persistence, honestly.",
+    "New \u201cNo\u201d buttons keep appearing. Coincidence?",
+    "At this point it\u2019s basically a workout.",
+    "The bear has given up hope in you clicking No.",
+    "You could just click Yes, you know.",
+    "This is genuinely impressive dedication.",
+    "I\u2019m not giving up. Are you?",
+    "Okay okay, the bear is proud of your stamina.",
+    "One click away from making my day.",
+    "Still just the one answer I\u2019m after\u2026"
+  ];
+
+  var teddyLines = [
+    "please?",
+    "pretty please?",
+    "for me?",
+    "c\u2019mon\u2026",
+    "I believe in you",
+    "just say yes",
+    "so close!",
+    ":')"
   ];
 
   var noCount = 0;
   var evasive = false;
   var lastMoveTs = 0;
+  var evasiveButtons = [];
+  var decoyCount = 0;
+  var MAX_DECOYS = 3;
 
   function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
 
+  function shakeTeddy(){
+    teddyWrap.classList.remove('shake');
+    void teddyWrap.offsetWidth;
+    teddyWrap.classList.add('shake');
+    var line = teddyLines[clamp(noCount-1, 0, teddyLines.length-1)];
+    teddyBubble.textContent = line;
+    teddyBubble.classList.add('show');
+    clearTimeout(shakeTeddy._t);
+    shakeTeddy._t = setTimeout(function(){ teddyBubble.classList.remove('show'); }, 1800);
+  }
+
   function updateSizes(){
-    var yesScale = clamp(1 + noCount*0.14, 1, 2.1);
-    var noScale = clamp(1 - noCount*0.13, 0.22, 1);
+    var yesScale = clamp(1 + noCount*0.11, 1, 2.4);
+    var noScale = clamp(1 - noCount*0.1, 0.22, 1);
 
     yesBtn.style.transform = 'scale(' + yesScale + ')';
     yesBtn.style.zIndex = 20;
+    if(noCount >= 6){ yesBtn.classList.add('mega'); }
 
     if(!evasive){
       noBtn.style.transform = 'scale(' + noScale + ')';
@@ -532,31 +672,36 @@
     var msgIndex = clamp(noCount, 0, noMessages.length-1);
     supportLine.textContent = noMessages[msgIndex];
 
-    var warmth = clamp(noCount/6, 0, 1);
+    var warmth = clamp(noCount/8, 0, 1);
     document.documentElement.style.setProperty('--warmth', warmth);
     density = 34 + Math.round(warmth*40);
     ensureParticles();
 
     if(noCount >= 2 && !evasive){
-      enableEvasion();
+      enableEvasion(noBtn);
+    }
+    if(noCount >= 3 && decoyCount < MAX_DECOYS){
+      spawnDecoy();
     }
   }
 
-  function enableEvasion(){
-    evasive = true;
-    var rect = noBtn.getBoundingClientRect();
-    noBtn.classList.add('evasive');
-    noBtn.style.left = rect.left + 'px';
-    noBtn.style.top = rect.top + 'px';
+  function enableEvasion(btn){
+    if(btn === noBtn) evasive = true;
+    var rect = btn.getBoundingClientRect();
+    btn.classList.add('evasive');
+    btn.style.left = rect.left + 'px';
+    btn.style.top = rect.top + 'px';
+    if(evasiveButtons.indexOf(btn) === -1) evasiveButtons.push(btn);
   }
 
-  function moveNoButtonAwayFrom(px, py){
+  function moveButtonAwayFrom(btn, px, py){
     var now = Date.now();
-    if(now - lastMoveTs < 260) return;
-    lastMoveTs = now;
+    var key = '_lastMove';
+    if(btn[key] && now - btn[key] < 260) return;
+    btn[key] = now;
 
-    var btnW = noBtn.offsetWidth || 90;
-    var btnH = noBtn.offsetHeight || 44;
+    var btnW = btn.offsetWidth || 90;
+    var btnH = btn.offsetHeight || 44;
     var margin = 24;
 
     var cardRect = card.getBoundingClientRect();
@@ -572,30 +717,57 @@
       attempts++;
     } while((overlapsCard || tooClose) && attempts < 12);
 
-    noBtn.style.left = x + 'px';
-    noBtn.style.top = y + 'px';
+    btn.style.left = x + 'px';
+    btn.style.top = y + 'px';
   }
 
   function registerNoAttempt(){
     noCount++;
     updateSizes();
+    shakeTeddy();
   }
 
-  noBtn.addEventListener('click', function(e){
-    registerNoAttempt();
-    if(evasive){
-      moveNoButtonAwayFrom(e.clientX, e.clientY);
-    }
-  });
-
-  noBtn.addEventListener('touchstart', function(e){
-    if(evasive){
-      e.preventDefault();
-      var t = e.touches[0];
+  function wireNoLikeButton(btn){
+    btn.addEventListener('click', function(e){
       registerNoAttempt();
-      moveNoButtonAwayFrom(t.clientX, t.clientY);
+      if(btn.classList.contains('evasive')){
+        moveButtonAwayFrom(btn, e.clientX, e.clientY);
+      }
+    });
+    btn.addEventListener('touchstart', function(e){
+      if(btn.classList.contains('evasive')){
+        e.preventDefault();
+        var t = e.touches[0];
+        registerNoAttempt();
+        moveButtonAwayFrom(btn, t.clientX, t.clientY);
+      }
+    }, {passive:false});
+    if(!isTouch){
+      btn.addEventListener('mouseenter', function(){ cursorRing.classList.add('on-no'); });
+      btn.addEventListener('mouseleave', function(){ cursorRing.classList.remove('on-no'); });
     }
-  }, {passive:false});
+  }
+
+  var decoyTexts = ["No", "Nope", "Nah", "No thanks", "Still no"];
+  function spawnDecoy(){
+    decoyCount++;
+    var d = document.createElement('button');
+    d.className = 'btn btn-no decoy evasive';
+    d.textContent = decoyTexts[clamp(decoyCount-1, 0, decoyTexts.length-1)];
+    document.body.appendChild(d);
+    var x = margin_rand();
+    var y = margin_rand(true);
+    d.style.left = x + 'px';
+    d.style.top = y + 'px';
+    wireNoLikeButton(d);
+    evasiveButtons.push(d);
+  }
+  function margin_rand(isY){
+    var dim = isY ? window.innerHeight : window.innerWidth;
+    return 20 + Math.random()*(dim - 140);
+  }
+
+  wireNoLikeButton(noBtn);
 
   yesBtn.addEventListener('click', function(){
     triggerYes();
@@ -606,16 +778,16 @@
     document.addEventListener('mousemove', function(e){
       if(!sceneQuestion.classList.contains('active')) return;
 
-      if(evasive){
-        var r = noBtn.getBoundingClientRect();
+      evasiveButtons.forEach(function(btn){
+        var r = btn.getBoundingClientRect();
         var cx = r.left + r.width/2, cy = r.top + r.height/2;
         var dx = e.clientX - cx, dy = e.clientY - cy;
         var dist = Math.sqrt(dx*dx+dy*dy);
-        var radius = clamp(150 - noCount*6, 70, 150);
+        var radius = clamp(150 - noCount*4, 70, 150);
         if(dist < radius){
-          moveNoButtonAwayFrom(e.clientX, e.clientY);
+          moveButtonAwayFrom(btn, e.clientX, e.clientY);
         }
-      }
+      });
 
       if(noCount >= 3){
         var yr = yesBtn.getBoundingClientRect();
@@ -623,7 +795,7 @@
         var ydx = e.clientX - ycx, ydy = e.clientY - ycy;
         var ydist = Math.sqrt(ydx*ydx+ydy*ydy);
         var magRadius = 170;
-        var baseScale = clamp(1 + noCount*0.14, 1, 2.1);
+        var baseScale = clamp(1 + noCount*0.11, 1, 2.4);
         if(ydist < magRadius){
           var pull = (1 - ydist/magRadius) * 14;
           var nx = (ydx/ (ydist||1)) * pull;
@@ -639,8 +811,6 @@
 
     yesBtn.addEventListener('mouseenter', function(){ cursorRing.classList.add('on-yes'); });
     yesBtn.addEventListener('mouseleave', function(){ cursorRing.classList.remove('on-yes'); });
-    noBtn.addEventListener('mouseenter', function(){ cursorRing.classList.add('on-no'); });
-    noBtn.addEventListener('mouseleave', function(){ cursorRing.classList.remove('on-no'); });
   }
 
   /* subtle card parallax */
@@ -653,7 +823,7 @@
     });
   });
 
-  /* ---------- YES celebration ---------- */
+  /* ---------- YES -> calendar ---------- */
   var yesTriggered = false;
   function triggerYes(){
     if(yesTriggered) return;
@@ -667,16 +837,96 @@
 
     document.documentElement.style.setProperty('--warmth', 1);
 
-    setTimeout(function(){ activate(sceneYes); }, 550);
+    // clean up any decoy buttons
+    document.querySelectorAll('.decoy').forEach(function(b){ b.remove(); });
+
+    setTimeout(function(){
+      activate(sceneCalendar);
+      buildCalendar();
+    }, 650);
   }
 
-  var pickerBtn = document.getElementById('pickerBtn');
-  var finalLine = document.getElementById('finalLine');
-  pickerBtn.addEventListener('click', function(){
-    finalLine.classList.add('show');
-    var r = pickerBtn.getBoundingClientRect();
+  /* ---------- calendar ---------- */
+  var calGrid = document.getElementById('calGrid');
+  var calMonth = document.getElementById('calMonth');
+  var SPECIAL_DAY = 23;
+  var weekdayLabels = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function buildCalendar(){
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = 8; // September (0-indexed)
+    if(now.getMonth() > 8 || (now.getMonth() === 8 && now.getDate() > 30)){
+      // if somehow already past September, still show September of this year
+      year = now.getFullYear();
+    }
+    calMonth.textContent = monthNames[month] + ' ' + year;
+
+    var first = new Date(year, month, 1);
+    var startDay = first.getDay();
+    var daysInMonth = new Date(year, month+1, 0).getDate();
+
+    calGrid.innerHTML = '';
+    weekdayLabels.forEach(function(w){
+      var h = document.createElement('div');
+      h.className = 'cal-head';
+      h.textContent = w;
+      calGrid.appendChild(h);
+    });
+
+    for(var i=0;i<startDay;i++){
+      var pad = document.createElement('div');
+      pad.className = 'cal-day empty';
+      calGrid.appendChild(pad);
+    }
+
+    for(var d=1; d<=daysInMonth; d++){
+      var cell = document.createElement('button');
+      cell.textContent = d;
+      if(d === SPECIAL_DAY){
+        cell.className = 'cal-day special';
+        cell.addEventListener('click', onSpecialDayPicked);
+      } else {
+        cell.className = 'cal-day off';
+        cell.disabled = true;
+      }
+      calGrid.appendChild(cell);
+    }
+  }
+
+  function onSpecialDayPicked(e){
+    var r = e.currentTarget.getBoundingClientRect();
     spawnBurst(r.left+r.width/2, r.top+r.height/2);
-  });
+    document.documentElement.style.setProperty('--warmth', 1);
+    setTimeout(function(){
+      activate(sceneFinal);
+      startCountdown();
+    }, 500);
+  }
+
+  /* ---------- final countdown + redirect ---------- */
+  var countdownEl = document.getElementById('countdownNum');
+  var REDIRECT_URL = 'https://onam-coupons.vercel.app/';
+  var countdownStarted = false;
+
+  function startCountdown(){
+    if(countdownStarted) return;
+    countdownStarted = true;
+    var n = 5;
+    countdownEl.textContent = n;
+    var iv = setInterval(function(){
+      n--;
+      if(n < 0){
+        clearInterval(iv);
+        window.location.href = REDIRECT_URL;
+        return;
+      }
+      countdownEl.textContent = n;
+      var r = countdownEl.getBoundingClientRect();
+      spawnBurst(r.left+r.width/2, r.top+r.height/2);
+    }, 1000);
+  }
 
   updateSizes();
 })();
