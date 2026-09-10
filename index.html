@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>A Little Something to Ask You</title>
+<style>
+  :root{
+    --bg-0:#0a0807;
+    --bg-1:#120d0a;
+    --ivory:#f2e8d6;
+    --ivory-dim:#c9bda8;
+    --burgundy:#54121e;
+    --burgundy-light:#7c2233;
+    --gold:#c9a24b;
+    --gold-light:#e8cb8f;
+    --rose:#c98d84;
+    --glow: 201,162,75;
+    --warmth: 0;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html,body{
+    height:100%;
+    margin:0;
+    background: radial-gradient(120% 140% at 50% 30%, var(--bg-1), var(--bg-0) 70%);
+    color: var(--ivory);
+    font-family: var(--sans);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  #bg-canvas{
+    position:fixed; inset:0; width:100%; height:100%; z-index:0; display:block;
+  }
+
+  .grain{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    opacity:0.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  .vignette{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background: radial-gradient(120% 90% at 50% 45%, transparent 40%, rgba(0,0,0,0.55) 100%);
+  }
+
+  .stage{
+    position:relative; z-index:2; height:100vh; width:100%;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .scene{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    padding: 8vh 6vw;
+    text-align:center;
+    opacity:0; visibility:hidden; pointer-events:none;
+    filter:blur(10px);
+    transform: scale(0.97);
+    transition: opacity 1.4s cubic-bezier(.19,1,.22,1), filter 1.4s cubic-bezier(.19,1,.22,1), transform 1.4s cubic-bezier(.19,1,.22,1);
+  }
+  .scene.active{
+    opacity:1; visibility:visible; pointer-events:auto;
+    filter:blur(0); transform:scale(1);
+  }
+
+  .intro-line{
+    font-family: var(--serif);
+    font-style:italic;
+    font-weight:400;
+    font-size: clamp(1.3rem, 3.6vw, 2.4rem);
+    color: var(--ivory-dim);
+    letter-spacing: 0.01em;
+    opacity:0;
+    transform: translateY(14px);
+    transition: opacity 1.6s cubic-bezier(.19,1,.22,1), transform 1.6s cubic-bezier(.19,1,.22,1);
+    max-width: 20ch;
+  }
+  .intro-line.show{ opacity:1; transform:translateY(0); }
+
+  .eyebrow{
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    color: var(--gold-light);
+    opacity:0;
+    margin-bottom: 1.4rem;
+    transform: translateY(8px);
+    transition: opacity 1.2s ease 0.2s, transform 1.2s ease 0.2s;
+  }
+  .scene.active .eyebrow{ opacity:0.85; transform:translateY(0); }
+
+  .question-main{
+    font-family: var(--serif);
+    font-weight:400;
+    font-size: clamp(2.1rem, 6vw, 4.2rem);
+    line-height:1.15;
+    color: var(--ivory);
+    max-width: 14ch;
+    letter-spacing: 0.005em;
+    opacity:0;
+    transform: translateY(18px);
+    transition: opacity 1.3s cubic-bezier(.19,1,.22,1) 0.15s, transform 1.3s cubic-bezier(.19,1,.22,1) 0.15s;
+  }
+  .scene.active .question-main{ opacity:1; transform:translateY(0); }
+
+  .support-line{
+    font-family: var(--sans);
+    font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+    color: var(--ivory-dim);
+    margin-top: 1.6rem;
+    min-height: 1.4em;
+    transition: opacity 0.5s ease;
+  }
+
+  .buttons-row{
+    display:flex; align-items:center; justify-content:center; gap: 1.6rem;
+    margin-top: 3.2rem;
+    position:relative;
+    min-height: 90px;
+    width:100%;
+    flex-wrap: nowrap;
+  }
+
+  .btn{
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight:600;
+    letter-spacing:0.02em;
+    border-radius: 999px;
+    padding: 0.95em 2.4em;
+    cursor:pointer;
+    border:1px solid transparent;
+    position:relative;
+    user-select:none;
+    -webkit-user-select:none;
+    transition: transform 0.55s cubic-bezier(.34,1.56,.64,1), box-shadow 0.5s ease, background 0.5s ease, font-size 0.4s ease, padding 0.4s ease, opacity 0.4s ease, left 0.5s cubic-bezier(.22,1,.36,1), top 0.5s cubic-bezier(.22,1,.36,1);
+    will-change: transform;
+  }
+
+  .btn-yes{
+    background: linear-gradient(135deg, var(--burgundy-light), var(--burgundy));
+    color: var(--gold-light);
+    border: 1px solid rgba(201,162,75,0.55);
+    box-shadow: 0 0 0 rgba(201,162,75,0.0), 0 8px 30px rgba(0,0,0,0.35);
+  }
+  .btn-yes:hover{
+    box-shadow: 0 0 28px rgba(201,162,75,0.45), 0 10px 34px rgba(0,0,0,0.4);
+    transform: translateY(-2px) scale(1.03);
+  }
+
+  .btn-no{
+    background: transparent;
+    color: var(--ivory-dim);
+    border: 1px solid rgba(242,232,214,0.25);
+  }
+  .btn-no:hover{
+    border-color: rgba(242,232,214,0.5);
+    color: var(--ivory);
+  }
+
+  .btn-no.evasive{
+    position: fixed;
+    z-index: 30;
+  }
+
+  .card{
+    position:relative;
+    padding: 2.6rem 3rem;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+    border: 1px solid rgba(201,162,75,0.25);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+    max-width: 620px;
+    width: 100%;
+  }
+
+  .status-card{
+    margin-top: 2.4rem;
+    display:inline-flex;
+    flex-direction:column;
+    gap:0.35rem;
+    padding: 1.1rem 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(201,162,75,0.35);
+    background: rgba(201,162,75,0.06);
+  }
+  .status-label{
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    color: var(--gold-light);
+    opacity: 0.85;
+  }
+  .status-value{
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--ivory);
+  }
+
+  .yes-heading{
+    font-family: var(--serif);
+    font-size: clamp(1.9rem, 5vw, 3.2rem);
+    line-height:1.2;
+    max-width: 15ch;
+    opacity:0; transform: translateY(16px);
+    transition: opacity 1.1s cubic-bezier(.19,1,.22,1) 0.3s, transform 1.1s cubic-bezier(.19,1,.22,1) 0.3s;
+  }
+  .scene.active .yes-heading{ opacity:1; transform:translateY(0); }
+
+  .yes-sub{
+    font-family: var(--sans);
+    color: var(--ivory-dim);
+    margin-top: 1rem;
+    font-size: 1rem;
+    opacity:0; transform: translateY(10px);
+    transition: opacity 1.1s cubic-bezier(.19,1,.22,1) 0.6s, transform 1.1s cubic-bezier(.19,1,.22,1) 0.6s;
+  }
+  .scene.active .yes-sub{ opacity:1; transform:translateY(0); }
+
+  .final-line{
+    margin-top: 1.6rem;
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--gold-light);
+    font-size: 1.15rem;
+    opacity:0;
+    max-height:0;
+    overflow:hidden;
+    transition: opacity 0.9s ease, max-height 0.9s ease;
+  }
+  .final-line.show{ opacity:1; max-height: 4em; }
+
+  .picker-btn{
+    margin-top: 2.2rem;
+    background: transparent;
+    border: 1px solid rgba(201,162,75,0.45);
+    color: var(--gold-light);
+    font-family: var(--sans);
+    font-size: 0.92rem;
+    letter-spacing: 0.03em;
+    padding: 0.8em 1.8em;
+    border-radius: 999px;
+    cursor:pointer;
+    transition: background 0.4s ease, color 0.4s ease, transform 0.4s ease;
+    opacity:0; transform: translateY(10px);
+  }
+  .scene.active .picker-btn{ opacity:1; transform:translateY(0); transition-delay: 0.9s, 0.9s, 0s; }
+  .picker-btn:hover{ background: rgba(201,162,75,0.14); transform: translateY(-2px); }
+
+  /* custom cursor */
+  .cursor-dot, .cursor-ring{
+    position:fixed; top:0; left:0; pointer-events:none; z-index:100;
+    border-radius:50%;
+    transform: translate(-50%,-50%);
+  }
+  .cursor-dot{
+    width:5px; height:5px; background: var(--gold-light);
+    box-shadow: 0 0 8px rgba(201,162,75,0.9);
+    transition: opacity 0.3s ease;
+  }
+  .cursor-ring{
+    width:34px; height:34px; border:1px solid rgba(201,162,75,0.45);
+    transition: width 0.35s ease, height 0.35s ease, border-color 0.35s ease, opacity 0.3s ease, transform 0.12s ease-out;
+  }
+  .cursor-ring.on-yes{ width:52px; height:52px; border-color: rgba(201,162,75,0.9); }
+  .cursor-ring.on-no{ width:26px; height:26px; border-color: rgba(242,232,214,0.5); }
+
+  @media (hover:none), (pointer:coarse){
+    .cursor-dot, .cursor-ring{ display:none; }
+    body{ cursor:auto; }
+  }
+  @media (hover:hover) and (pointer:fine){
+    body{ cursor:none; }
+    .btn{ cursor:none; }
+  }
+
+  @media (max-width: 560px){
+    .card{ padding: 2rem 1.4rem; }
+    .buttons-row{ gap: 1rem; }
+    .btn{ padding: 0.9em 1.7em; font-size:0.95rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="stage">
+
+  <section class="scene active" id="scene-intro1">
+    <p class="intro-line" id="intro1a">Okay&hellip; I have a little something to ask you.</p>
+  </section>
+
+  <section class="scene" id="scene-intro2">
+    <p class="intro-line" id="intro2a">Something I&rsquo;ve been meaning to ask.</p>
+  </section>
+
+  <section class="scene" id="scene-question">
+    <div class="card">
+      <div class="eyebrow">a question</div>
+      <h1 class="question-main" id="mainQuestion">Would you go on a date with me?</h1>
+      <p class="support-line" id="supportLine">&nbsp;</p>
+      <div class="buttons-row" id="buttonsRow">
+        <button class="btn btn-yes" id="yesBtn">YES</button>
+        <button class="btn btn-no" id="noBtn">NO</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="scene-yes">
+    <div class="card" style="text-align:center;">
+      <h2 class="yes-heading">I was really hoping you&rsquo;d say yes.</h2>
+      <p class="yes-sub">Then it&rsquo;s officially a date.<br>Now all that&rsquo;s left is deciding where we&rsquo;re going.</p>
+      <div class="status-card">
+        <span class="status-label">DATE STATUS</span>
+        <span class="status-value">Confirmed</span>
+      </div>
+      <br>
+      <button class="picker-btn" id="pickerBtn">Okay, now pick a date</button>
+      <p class="final-line" id="finalLine">First things first&hellip; you owe me a date.</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var isTouch = window.matchMedia("(hover:none), (pointer:coarse)").matches;
+
+  /* ---------- background particle canvas ---------- */
+  var canvas = document.getElementById('bg-canvas');
+  var ctx = canvas.getContext('2d');
+  var W, H, particles = [];
+  var density = 34;
+  var burst = [];
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function makeParticle(){
+    return {
+      x: Math.random()*W,
+      y: Math.random()*H,
+      r: Math.random()*1.4 + 0.3,
+      s: Math.random()*0.25 + 0.05,
+      o: Math.random()*0.5 + 0.15,
+      drift: (Math.random()-0.5)*0.15
+    };
+  }
+  function ensureParticles(){
+    while(particles.length < density) particles.push(makeParticle());
+    while(particles.length > density) particles.pop();
+  }
+  ensureParticles();
+
+  function spawnBurst(cx, cy){
+    for(var i=0;i<70;i++){
+      var ang = Math.random()*Math.PI*2;
+      var speed = Math.random()*2.6 + 0.6;
+      var heart = Math.random() < 0.35;
+      burst.push({
+        x: cx, y: cy,
+        vx: Math.cos(ang)*speed,
+        vy: Math.sin(ang)*speed - 0.6,
+        life: 1,
+        decay: Math.random()*0.006 + 0.004,
+        r: heart ? (Math.random()*5+4) : (Math.random()*2+0.8),
+        heart: heart,
+        hue: Math.random() < 0.5 ? 'gold' : 'rose'
+      });
+    }
+  }
+
+  function drawHeart(x,y,size,alpha,color){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.scale(size/10, size/10);
+    ctx.beginPath();
+    ctx.moveTo(0,3);
+    ctx.bezierCurveTo(0,-2,-6,-2,-6,2);
+    ctx.bezierCurveTo(-6,6,0,9,0,12);
+    ctx.bezierCurveTo(0,9,6,6,6,2);
+    ctx.bezierCurveTo(6,-2,0,-2,0,3);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.globalAlpha = alpha;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+
+    var warmth = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--warmth')) || 0;
+
+    for(var i=0;i<particles.length;i++){
+      var p = particles[i];
+      p.y -= p.s;
+      p.x += p.drift;
+      if(p.y < -10){ p.y = H+10; p.x = Math.random()*W; }
+      if(p.x < -10) p.x = W+10;
+      if(p.x > W+10) p.x = -10;
+      var g = 210 + warmth*20;
+      var b = 190 - warmth*60;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba('+ (230) +','+ g +','+ b +','+ (p.o) +')';
+      ctx.fill();
+    }
+
+    for(var j=burst.length-1;j>=0;j--){
+      var b2 = burst[j];
+      b2.x += b2.vx;
+      b2.y += b2.vy;
+      b2.vy += 0.02;
+      b2.vx *= 0.99;
+      b2.life -= b2.decay;
+      if(b2.life <= 0){ burst.splice(j,1); continue; }
+      var color = b2.hue === 'gold' ? 'rgba(232,203,143,' : 'rgba(201,141,132,';
+      if(b2.heart){
+        drawHeart(b2.x, b2.y, b2.r, Math.max(b2.life,0), color+'1)'.replace('1)', b2.life+')'));
+      } else {
+        ctx.beginPath();
+        ctx.arc(b2.x, b2.y, b2.r, 0, Math.PI*2);
+        ctx.fillStyle = color + Math.max(b2.life,0) + ')';
+        ctx.fill();
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  /* ---------- custom cursor ---------- */
+  var cursorDot = document.getElementById('cursorDot');
+  var cursorRing = document.getElementById('cursorRing');
+  var mouseX = W/2, mouseY = H/2;
+
+  if(!isTouch){
+    document.addEventListener('mousemove', function(e){
+      mouseX = e.clientX; mouseY = e.clientY;
+      cursorDot.style.left = mouseX+'px';
+      cursorDot.style.top = mouseY+'px';
+      cursorRing.style.left = mouseX+'px';
+      cursorRing.style.top = mouseY+'px';
+    });
+  }
+
+  /* ---------- scene sequencing ---------- */
+  var sceneIntro1 = document.getElementById('scene-intro1');
+  var sceneIntro2 = document.getElementById('scene-intro2');
+  var sceneQuestion = document.getElementById('scene-question');
+  var sceneYes = document.getElementById('scene-yes');
+  var intro1a = document.getElementById('intro1a');
+  var intro2a = document.getElementById('intro2a');
+
+  function activate(scene){
+    [sceneIntro1, sceneIntro2, sceneQuestion, sceneYes].forEach(function(s){
+      s.classList.remove('active');
+    });
+    scene.classList.add('active');
+  }
+
+  setTimeout(function(){ intro1a.classList.add('show'); }, 500);
+  setTimeout(function(){ intro1a.classList.remove('show'); }, 2600);
+  setTimeout(function(){ activate(sceneIntro2); }, 3300);
+  setTimeout(function(){ intro2a.classList.add('show'); }, 3700);
+  setTimeout(function(){ intro2a.classList.remove('show'); }, 5600);
+  setTimeout(function(){ activate(sceneQuestion); }, 6300);
+
+  /* ---------- question interaction ---------- */
+  var yesBtn = document.getElementById('yesBtn');
+  var noBtn = document.getElementById('noBtn');
+  var buttonsRow = document.getElementById('buttonsRow');
+  var supportLine = document.getElementById('supportLine');
+  var card = document.querySelector('#scene-question .card');
+
+  var noMessages = [
+    "",
+    "Hmm\u2026 think about it?",
+    "I\u2019ll give you another chance.",
+    "Are you sure?",
+    "Really sure?",
+    "You\u2019re making me work for this.",
+    "Okay, but I\u2019m still asking nicely.",
+    "Last chance\u2026 maybe?"
+  ];
+
+  var noCount = 0;
+  var evasive = false;
+  var lastMoveTs = 0;
+
+  function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+
+  function updateSizes(){
+    var yesScale = clamp(1 + noCount*0.14, 1, 2.1);
+    var noScale = clamp(1 - noCount*0.13, 0.22, 1);
+
+    yesBtn.style.transform = 'scale(' + yesScale + ')';
+    yesBtn.style.zIndex = 20;
+
+    if(!evasive){
+      noBtn.style.transform = 'scale(' + noScale + ')';
+    }
+
+    if(noScale <= 0.35){
+      noBtn.textContent = 'no?';
+    }
+
+    var msgIndex = clamp(noCount, 0, noMessages.length-1);
+    supportLine.textContent = noMessages[msgIndex];
+
+    var warmth = clamp(noCount/6, 0, 1);
+    document.documentElement.style.setProperty('--warmth', warmth);
+    density = 34 + Math.round(warmth*40);
+    ensureParticles();
+
+    if(noCount >= 2 && !evasive){
+      enableEvasion();
+    }
+  }
+
+  function enableEvasion(){
+    evasive = true;
+    var rect = noBtn.getBoundingClientRect();
+    noBtn.classList.add('evasive');
+    noBtn.style.left = rect.left + 'px';
+    noBtn.style.top = rect.top + 'px';
+  }
+
+  function moveNoButtonAwayFrom(px, py){
+    var now = Date.now();
+    if(now - lastMoveTs < 260) return;
+    lastMoveTs = now;
+
+    var btnW = noBtn.offsetWidth || 90;
+    var btnH = noBtn.offsetHeight || 44;
+    var margin = 24;
+
+    var cardRect = card.getBoundingClientRect();
+    var attempts = 0;
+    var x, y, overlapsCard, tooClose;
+
+    do{
+      x = margin + Math.random()*(window.innerWidth - btnW - margin*2);
+      y = margin + Math.random()*(window.innerHeight - btnH - margin*2);
+      overlapsCard = (x < cardRect.right && x+btnW > cardRect.left && y < cardRect.bottom && y+btnH > cardRect.top);
+      var dx = (x+btnW/2) - px, dy = (y+btnH/2) - py;
+      tooClose = Math.sqrt(dx*dx+dy*dy) < 160;
+      attempts++;
+    } while((overlapsCard || tooClose) && attempts < 12);
+
+    noBtn.style.left = x + 'px';
+    noBtn.style.top = y + 'px';
+  }
+
+  function registerNoAttempt(){
+    noCount++;
+    updateSizes();
+  }
+
+  noBtn.addEventListener('click', function(e){
+    registerNoAttempt();
+    if(evasive){
+      moveNoButtonAwayFrom(e.clientX, e.clientY);
+    }
+  });
+
+  noBtn.addEventListener('touchstart', function(e){
+    if(evasive){
+      e.preventDefault();
+      var t = e.touches[0];
+      registerNoAttempt();
+      moveNoButtonAwayFrom(t.clientX, t.clientY);
+    }
+  }, {passive:false});
+
+  yesBtn.addEventListener('click', function(){
+    triggerYes();
+  });
+
+  /* mouse-driven evasion + magnetism (desktop) */
+  if(!isTouch){
+    document.addEventListener('mousemove', function(e){
+      if(!sceneQuestion.classList.contains('active')) return;
+
+      if(evasive){
+        var r = noBtn.getBoundingClientRect();
+        var cx = r.left + r.width/2, cy = r.top + r.height/2;
+        var dx = e.clientX - cx, dy = e.clientY - cy;
+        var dist = Math.sqrt(dx*dx+dy*dy);
+        var radius = clamp(150 - noCount*6, 70, 150);
+        if(dist < radius){
+          moveNoButtonAwayFrom(e.clientX, e.clientY);
+        }
+      }
+
+      if(noCount >= 3){
+        var yr = yesBtn.getBoundingClientRect();
+        var ycx = yr.left + yr.width/2, ycy = yr.top + yr.height/2;
+        var ydx = e.clientX - ycx, ydy = e.clientY - ycy;
+        var ydist = Math.sqrt(ydx*ydx+ydy*ydy);
+        var magRadius = 170;
+        var baseScale = clamp(1 + noCount*0.14, 1, 2.1);
+        if(ydist < magRadius){
+          var pull = (1 - ydist/magRadius) * 14;
+          var nx = (ydx/ (ydist||1)) * pull;
+          var ny = (ydy/ (ydist||1)) * pull;
+          yesBtn.style.transform = 'translate(' + nx + 'px,' + ny + 'px) scale(' + baseScale + ')';
+          cursorRing.classList.add('on-yes');
+        } else {
+          yesBtn.style.transform = 'scale(' + baseScale + ')';
+          cursorRing.classList.remove('on-yes');
+        }
+      }
+    });
+
+    yesBtn.addEventListener('mouseenter', function(){ cursorRing.classList.add('on-yes'); });
+    yesBtn.addEventListener('mouseleave', function(){ cursorRing.classList.remove('on-yes'); });
+    noBtn.addEventListener('mouseenter', function(){ cursorRing.classList.add('on-no'); });
+    noBtn.addEventListener('mouseleave', function(){ cursorRing.classList.remove('on-no'); });
+  }
+
+  /* subtle card parallax */
+  document.addEventListener('mousemove', function(e){
+    if(isTouch) return;
+    var rx = (e.clientX / window.innerWidth - 0.5) * 6;
+    var ry = (e.clientY / window.innerHeight - 0.5) * -6;
+    document.querySelectorAll('.card').forEach(function(c){
+      c.style.transform = 'rotateX(' + ry + 'deg) rotateY(' + rx + 'deg)';
+    });
+  });
+
+  /* ---------- YES celebration ---------- */
+  var yesTriggered = false;
+  function triggerYes(){
+    if(yesTriggered) return;
+    yesTriggered = true;
+
+    var rect = yesBtn.getBoundingClientRect();
+    spawnBurst(rect.left+rect.width/2, rect.top+rect.height/2);
+    setTimeout(function(){
+      spawnBurst(window.innerWidth/2, window.innerHeight*0.4);
+    }, 200);
+
+    document.documentElement.style.setProperty('--warmth', 1);
+
+    setTimeout(function(){ activate(sceneYes); }, 550);
+  }
+
+  var pickerBtn = document.getElementById('pickerBtn');
+  var finalLine = document.getElementById('finalLine');
+  pickerBtn.addEventListener('click', function(){
+    finalLine.classList.add('show');
+    var r = pickerBtn.getBoundingClientRect();
+    spawnBurst(r.left+r.width/2, r.top+r.height/2);
+  });
+
+  updateSizes();
+})();
+</script>
+
+</body>
+</html>
