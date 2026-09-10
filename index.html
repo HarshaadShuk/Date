@@ -621,15 +621,31 @@
   ];
 
   var teddyLines = [
-    "Please?",
-    "Pretty please?",
-    "For me?",
-    "Come on…",
-    "I believe in you!",
-    "Just say yes!",
-    "So close!",
-    ":')"
-  ];
+  "Please? 🥺",
+  "Pretty please?",
+  "For me? 🥺",
+  "Come on… I’m rooting for you!",
+  "I believe in you!",
+  "You know you want to say yes…",
+  "Just one little YES!",
+  "I’m not giving up on you!",
+  "The bear believes in us!",
+  "Okay… that was definitely a NO 😭",
+  "You really clicked it again?!",
+  "At this point, I’m impressed.",
+  "The teddy is emotionally invested now.",
+  "I have a feeling you’re going to say yes…",
+  "Look at that YES button getting prettier 👀",
+  "You’re making this bear work overtime.",
+  "Okay okay… I’ll ask nicely again.",
+  "We’re getting VERY close now.",
+  "The NO is getting suspiciously tiny…",
+  "Can you even see the NO anymore? 😂",
+  "Bro… WHERE IS THE NO BUTTON? 😭",
+  "I think the NO button needs a magnifying glass.",
+  "At this point, YES is basically the only option.",
+  "LESSGOOOOOO 🥹❤️"
+];
 
   var noCount = 0;
   
@@ -649,10 +665,10 @@
 
 function updateSizes(){
   // YES gets bigger every time she clicks NO
-  var yesScale = clamp(1 + noCount * 0.13, 1, 2.5);
+  var yesScale = clamp(1 + noCount * 0.15, 1, 2.8);
 
   // NO gets smaller every time she clicks NO
-  var noScale = clamp(1 - noCount * 0.12, 0.06, 1);
+  var noScale = clamp(1 - noCount * 0.13, 0.025, 1);
 
   // Apply sizes
   yesBtn.style.transform = 'scale(' + yesScale + ')';
@@ -661,9 +677,17 @@ function updateSizes(){
   noBtn.style.transform = 'scale(' + noScale + ')';
 
   // Once NO gets tiny, change the text
-  if(noScale <= 0.35){
-    noBtn.textContent = 'No?';
-  }
+  if(noScale <= 0.35 && noScale > 0.12){
+  noBtn.textContent = 'No?';
+}
+
+if(noScale <= 0.12 && noScale > 0.05){
+  noBtn.textContent = 'no...';
+}
+
+if(noScale <= 0.05){
+  noBtn.textContent = 'no';
+}
 
   // Change the message underneath
   var msgIndex = clamp(noCount, 0, noMessages.length - 1);
