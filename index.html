@@ -18,7 +18,7 @@
     --glow: 201,162,75;
     --warmth: 0;
     --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Times New Roman', serif;
-    --sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   }
 
   *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -78,14 +78,15 @@
     opacity:0;
     transform: translateY(14px);
     transition: opacity 1.6s cubic-bezier(.19,1,.22,1), transform 1.6s cubic-bezier(.19,1,.22,1);
-    max-width: 20ch;
+    max-width: 22ch;
   }
   .intro-line.show{ opacity:1; transform:translateY(0); }
 
   .eyebrow{
     font-family: var(--sans);
     font-size: 0.78rem;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
     color: var(--gold-light);
     opacity:0;
     margin-bottom: 1.4rem;
@@ -98,7 +99,7 @@
     font-family: var(--serif);
     font-weight:400;
     font-size: clamp(2.1rem, 6vw, 4.2rem);
-    line-height:1.15;
+    line-height:1.18;
     color: var(--ivory);
     max-width: 14ch;
     letter-spacing: 0.005em;
@@ -130,7 +131,7 @@
     font-family: var(--sans);
     font-size: 1rem;
     font-weight:600;
-    letter-spacing:0.02em;
+    letter-spacing:0.04em;
     border-radius: 999px;
     padding: 0.95em 2.4em;
     cursor:pointer;
@@ -213,7 +214,7 @@
     bottom: 100%;
     right: 6px;
     margin-bottom: 10px;
-    background: rgba(20,14,11,0.9);
+    background: rgba(20,14,11,0.92);
     border: 1px solid rgba(201,162,75,0.4);
     color: var(--gold-light);
     font-family: var(--serif);
@@ -258,8 +259,10 @@
     font-family: var(--sans);
     font-size: 0.72rem;
     color: var(--gold-light);
-    opacity:0.7;
+    opacity:0.75;
     padding-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
   .cal-day{
     aspect-ratio: 1;
@@ -296,8 +299,9 @@
     font-family: var(--serif);
     font-size: clamp(1.7rem, 4.6vw, 2.7rem);
     line-height:1.25;
-    max-width: 16ch;
+    max-width: 18ch;
     color: var(--gold-light);
+    margin: 0 auto;
     opacity:0; transform: translateY(14px);
     transition: opacity 1s cubic-bezier(.19,1,.22,1) 0.2s, transform 1s cubic-bezier(.19,1,.22,1) 0.2s;
   }
@@ -305,11 +309,12 @@
   .final-sub{
     font-family: var(--sans);
     color: var(--ivory-dim);
-    margin-top: 0.9rem;
-    font-size: 0.95rem;
+    margin-top: 1.1rem;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
   }
   .countdown{
-    margin-top: 2rem;
+    margin: 2rem auto 0;
     width: 74px; height:74px;
     border-radius:50%;
     border: 1px solid rgba(201,162,75,0.5);
@@ -320,12 +325,12 @@
     background: rgba(201,162,75,0.08);
   }
   .redirect-note{
-    margin-top: 1rem;
-    font-size: 0.78rem;
+    margin-top: 1.2rem;
+    font-size: 0.82rem;
     color: var(--ivory-dim);
-    opacity:0.75;
+    opacity:0.8;
   }
-  .redirect-note a{ color: var(--gold-light); }
+  .redirect-note a{ color: var(--gold-light); text-decoration: underline; text-underline-offset: 3px; }
 
   /* custom cursor */
   .cursor-dot, .cursor-ring{
@@ -378,16 +383,16 @@
 <div class="stage">
 
   <section class="scene active" id="scene-intro1">
-    <p class="intro-line" id="intro1a">Okay&hellip; I have a little something to ask you.</p>
+    <p class="intro-line" id="intro1a">I have a little question for you&hellip;</p>
   </section>
 
   <section class="scene" id="scene-intro2">
-    <p class="intro-line" id="intro2a">Something I&rsquo;ve been meaning to ask.</p>
+    <p class="intro-line" id="intro2a">Something I’ve been wanting to ask for a while.</p>
   </section>
 
   <section class="scene" id="scene-question">
     <div class="card" id="questionCard">
-      <div class="eyebrow">a question</div>
+      <div class="eyebrow">A Special Request</div>
       <h1 class="question-main" id="mainQuestion">Would you go on a date with me?</h1>
       <p class="support-line" id="supportLine">&nbsp;</p>
       <div class="buttons-row" id="buttonsRow">
@@ -395,7 +400,7 @@
         <button class="btn btn-no" id="noBtn">NO</button>
       </div>
       <div class="teddy-wrap" id="teddyWrap">
-        <div class="teddy-bubble" id="teddyBubble">please?</div>
+        <div class="teddy-bubble" id="teddyBubble">Please?</div>
         <svg viewBox="0 0 100 100" width="100%" height="100%">
           <ellipse cx="50" cy="78" rx="30" ry="20" fill="#7c2233"/>
           <circle cx="24" cy="60" r="11" fill="#c9a24b"/>
@@ -420,19 +425,20 @@
 
   <section class="scene" id="scene-calendar">
     <div class="card cal-card">
-      <div class="eyebrow">pick a date</div>
+      <div class="eyebrow">Pick a Date</div>
       <h2 class="cal-month" id="calMonth">September</h2>
-      <p class="cal-sub">Only one day on here actually works for me&hellip;</p>
+      <p class="cal-sub">Only one date here actually works for me&hellip;</p>
       <div class="cal-grid" id="calGrid"></div>
     </div>
   </section>
 
   <section class="scene" id="scene-final">
     <div class="card" style="text-align:center;">
-      <h2 class="final-heading">Great!!!! Let&rsquo;s meet at Onam at IISER Kolkata</h2>
-      <p class="final-sub">See you there.</p>
+      <div class="eyebrow">Invitation Confirmed</div>
+      <h2 class="final-heading">It’s a Date! Join me for Onam at IISER Kolkata</h2>
+      <p class="final-sub">We can’t wait to celebrate with you.</p>
       <div class="countdown" id="countdownNum">5</div>
-      <p class="redirect-note">Taking you there in a moment &mdash; or <a href="https://onam-coupons.vercel.app/" id="manualLink">tap here</a>.</p>
+      <p class="redirect-note">Redirecting you in a moment &mdash; or <a href="https://onam-coupons.vercel.app/" id="manualLink">tap here to proceed</a>.</p>
     </div>
   </section>
 
@@ -601,35 +607,35 @@
 
   var noMessages = [
     "",
-    "Hmm\u2026 think about it?",
-    "I\u2019ll give you another chance.",
-    "Are you sure?",
-    "Really sure?",
-    "You\u2019re making me work for this.",
-    "Okay, but I\u2019m still asking nicely.",
-    "The teddy bear is judging you right now.",
-    "Last chance\u2026 maybe?",
-    "Bold of you to keep going.",
-    "I respect the persistence, honestly.",
-    "New \u201cNo\u201d buttons keep appearing. Coincidence?",
-    "At this point it\u2019s basically a workout.",
-    "The bear has given up hope in you clicking No.",
-    "You could just click Yes, you know.",
-    "This is genuinely impressive dedication.",
-    "I\u2019m not giving up. Are you?",
-    "Okay okay, the bear is proud of your stamina.",
-    "One click away from making my day.",
-    "Still just the one answer I\u2019m after\u2026"
+    "Hmm… why not think about it?",
+    "I’ll give you another chance.",
+    "Are you completely sure?",
+    "Really, truly sure?",
+    "You’re making me work for this!",
+    "Okay, but I’m still asking nicely.",
+    "The teddy bear is judging your choice right now.",
+    "One last chance… maybe?",
+    "Bold of you to keep trying!",
+    "I respect the dedication, honestly.",
+    "More 'No' buttons keep appearing. A coincidence?",
+    "At this point, it’s practically a workout.",
+    "The bear has given up hope of you clicking 'No'.",
+    "You could always just click 'Yes', you know.",
+    "This is genuinely impressive persistence.",
+    "I'm not giving up. Are you?",
+    "Alright, the bear is proud of your stamina.",
+    "Just one click away from making my day.",
+    "There's still only one right answer here…"
   ];
 
   var teddyLines = [
-    "please?",
-    "pretty please?",
-    "for me?",
-    "c\u2019mon\u2026",
-    "I believe in you",
-    "just say yes",
-    "so close!",
+    "Please?",
+    "Pretty please?",
+    "For me?",
+    "Come on…",
+    "I believe in you!",
+    "Just say yes!",
+    "So close!",
     ":')"
   ];
 
@@ -666,7 +672,7 @@
     }
 
     if(noScale <= 0.35){
-      noBtn.textContent = 'no?';
+      noBtn.textContent = 'No?';
     }
 
     var msgIndex = clamp(noCount, 0, noMessages.length-1);
@@ -857,10 +863,7 @@
     var now = new Date();
     var year = now.getFullYear();
     var month = 8; // September (0-indexed)
-    if(now.getMonth() > 8 || (now.getMonth() === 8 && now.getDate() > 30)){
-      // if somehow already past September, still show September of this year
-      year = now.getFullYear();
-    }
+    
     calMonth.textContent = monthNames[month] + ' ' + year;
 
     var first = new Date(year, month, 1);
