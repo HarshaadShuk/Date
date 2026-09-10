@@ -139,7 +139,7 @@
     position:relative;
     user-select:none;
     -webkit-user-select:none;
-    transition: transform 0.55s cubic-bezier(.34,1.56,.64,1), box-shadow 0.5s ease, background 0.5s ease, font-size 0.4s ease, padding 0.4s ease, opacity 0.4s ease, left 0.5s cubic-bezier(.22,1,.36,1), top 0.5s cubic-bezier(.22,1,.36,1);
+    transition: transform 0.55s cubic-bezier(.34,1.56,.64,1), box-shadow 0.5s ease, background 0.5s ease, font-size 0.4s ease, padding 0.4s ease, opacity 0.4s ease;
     will-change: transform;
   }
 
@@ -167,15 +167,7 @@
     color: var(--ivory);
   }
 
-  .btn-no.evasive{
-    position: fixed;
-    z-index: 30;
-  }
-  .btn-no.decoy{
-    font-size: 0.85rem;
-    padding: 0.7em 1.6em;
-    opacity: 0.85;
-  }
+
 
   .card{
     position:relative;
@@ -617,7 +609,7 @@
     "One last chance… maybe?",
     "Bold of you to keep trying!",
     "I respect the dedication, honestly.",
-    "More 'No' buttons keep appearing. A coincidence?",
+    "You're really committed to that answer, aren't you?",
     "At this point, it’s practically a workout.",
     "The bear has given up hope of you clicking 'No'.",
     "You could always just click 'Yes', you know.",
@@ -640,11 +632,7 @@
   ];
 
   var noCount = 0;
-  var evasive = false;
-  var lastMoveTs = 0;
-  var evasiveButtons = [];
-  var decoyCount = 0;
-  var MAX_DECOYS = 3;
+  
 
   function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
 
@@ -659,73 +647,39 @@
     shakeTeddy._t = setTimeout(function(){ teddyBubble.classList.remove('show'); }, 1800);
   }
 
-  function updateSizes(){
-    var yesScale = clamp(1 + noCount*0.11, 1, 2.4);
-    var noScale = clamp(1 - noCount*0.1, 0.22, 1);
+function updateSizes(){
+  // YES gets bigger every time she clicks NO
+  var yesScale = clamp(1 + noCount * 0.13, 1, 2.5);
 
-    yesBtn.style.transform = 'scale(' + yesScale + ')';
-    yesBtn.style.zIndex = 20;
-    if(noCount >= 6){ yesBtn.classList.add('mega'); }
+  // NO gets smaller every time she clicks NO
+  var noScale = clamp(1 - noCount * 0.12, 0.06, 1);
 
-    if(!evasive){
-      noBtn.style.transform = 'scale(' + noScale + ')';
-    }
+  // Apply sizes
+  yesBtn.style.transform = 'scale(' + yesScale + ')';
+  yesBtn.style.zIndex = 20;
 
-    if(noScale <= 0.35){
-      noBtn.textContent = 'No?';
-    }
+  noBtn.style.transform = 'scale(' + noScale + ')';
 
-    var msgIndex = clamp(noCount, 0, noMessages.length-1);
-    supportLine.textContent = noMessages[msgIndex];
-
-    var warmth = clamp(noCount/8, 0, 1);
-    document.documentElement.style.setProperty('--warmth', warmth);
-    density = 34 + Math.round(warmth*40);
-    ensureParticles();
-
-    if(noCount >= 2 && !evasive){
-      enableEvasion(noBtn);
-    }
-    if(noCount >= 3 && decoyCount < MAX_DECOYS){
-      spawnDecoy();
-    }
+  // Once NO gets tiny, change the text
+  if(noScale <= 0.35){
+    noBtn.textContent = 'No?';
   }
 
-  function enableEvasion(btn){
-    if(btn === noBtn) evasive = true;
-    var rect = btn.getBoundingClientRect();
-    btn.classList.add('evasive');
-    btn.style.left = rect.left + 'px';
-    btn.style.top = rect.top + 'px';
-    if(evasiveButtons.indexOf(btn) === -1) evasiveButtons.push(btn);
-  }
+  // Change the message underneath
+  var msgIndex = clamp(noCount, 0, noMessages.length - 1);
+  supportLine.textContent = noMessages[msgIndex];
 
-  function moveButtonAwayFrom(btn, px, py){
-    var now = Date.now();
-    var key = '_lastMove';
-    if(btn[key] && now - btn[key] < 260) return;
-    btn[key] = now;
+  // Make the scene warmer as she keeps saying NO
+  var warmth = clamp(noCount / 8, 0, 1);
+  document.documentElement.style.setProperty('--warmth', warmth);
 
-    var btnW = btn.offsetWidth || 90;
-    var btnH = btn.offsetHeight || 44;
-    var margin = 24;
+  density = 34 + Math.round(warmth * 40);
+  ensureParticles();
+}
 
-    var cardRect = card.getBoundingClientRect();
-    var attempts = 0;
-    var x, y, overlapsCard, tooClose;
+  
 
-    do{
-      x = margin + Math.random()*(window.innerWidth - btnW - margin*2);
-      y = margin + Math.random()*(window.innerHeight - btnH - margin*2);
-      overlapsCard = (x < cardRect.right && x+btnW > cardRect.left && y < cardRect.bottom && y+btnH > cardRect.top);
-      var dx = (x+btnW/2) - px, dy = (y+btnH/2) - py;
-      tooClose = Math.sqrt(dx*dx+dy*dy) < 160;
-      attempts++;
-    } while((overlapsCard || tooClose) && attempts < 12);
 
-    btn.style.left = x + 'px';
-    btn.style.top = y + 'px';
-  }
 
   function registerNoAttempt(){
     noCount++;
@@ -733,45 +687,23 @@
     shakeTeddy();
   }
 
-  function wireNoLikeButton(btn){
-    btn.addEventListener('click', function(e){
-      registerNoAttempt();
-      if(btn.classList.contains('evasive')){
-        moveButtonAwayFrom(btn, e.clientX, e.clientY);
-      }
-    });
-    btn.addEventListener('touchstart', function(e){
-      if(btn.classList.contains('evasive')){
-        e.preventDefault();
-        var t = e.touches[0];
-        registerNoAttempt();
-        moveButtonAwayFrom(btn, t.clientX, t.clientY);
-      }
-    }, {passive:false});
-    if(!isTouch){
-      btn.addEventListener('mouseenter', function(){ cursorRing.classList.add('on-no'); });
-      btn.addEventListener('mouseleave', function(){ cursorRing.classList.remove('on-no'); });
-    }
-  }
+function wireNoLikeButton(btn){
+  btn.addEventListener('click', function(){
+    registerNoAttempt();
+  });
 
-  var decoyTexts = ["No", "Nope", "Nah", "No thanks", "Still no"];
-  function spawnDecoy(){
-    decoyCount++;
-    var d = document.createElement('button');
-    d.className = 'btn btn-no decoy evasive';
-    d.textContent = decoyTexts[clamp(decoyCount-1, 0, decoyTexts.length-1)];
-    document.body.appendChild(d);
-    var x = margin_rand();
-    var y = margin_rand(true);
-    d.style.left = x + 'px';
-    d.style.top = y + 'px';
-    wireNoLikeButton(d);
-    evasiveButtons.push(d);
+  if(!isTouch){
+    btn.addEventListener('mouseenter', function(){
+      cursorRing.classList.add('on-no');
+    });
+
+    btn.addEventListener('mouseleave', function(){
+      cursorRing.classList.remove('on-no');
+    });
   }
-  function margin_rand(isY){
-    var dim = isY ? window.innerHeight : window.innerWidth;
-    return 20 + Math.random()*(dim - 140);
-  }
+}
+
+
 
   wireNoLikeButton(noBtn);
 
@@ -779,45 +711,7 @@
     triggerYes();
   });
 
-  /* mouse-driven evasion + magnetism (desktop) */
-  if(!isTouch){
-    document.addEventListener('mousemove', function(e){
-      if(!sceneQuestion.classList.contains('active')) return;
-
-      evasiveButtons.forEach(function(btn){
-        var r = btn.getBoundingClientRect();
-        var cx = r.left + r.width/2, cy = r.top + r.height/2;
-        var dx = e.clientX - cx, dy = e.clientY - cy;
-        var dist = Math.sqrt(dx*dx+dy*dy);
-        var radius = clamp(150 - noCount*4, 70, 150);
-        if(dist < radius){
-          moveButtonAwayFrom(btn, e.clientX, e.clientY);
-        }
-      });
-
-      if(noCount >= 3){
-        var yr = yesBtn.getBoundingClientRect();
-        var ycx = yr.left + yr.width/2, ycy = yr.top + yr.height/2;
-        var ydx = e.clientX - ycx, ydy = e.clientY - ycy;
-        var ydist = Math.sqrt(ydx*ydx+ydy*ydy);
-        var magRadius = 170;
-        var baseScale = clamp(1 + noCount*0.11, 1, 2.4);
-        if(ydist < magRadius){
-          var pull = (1 - ydist/magRadius) * 14;
-          var nx = (ydx/ (ydist||1)) * pull;
-          var ny = (ydy/ (ydist||1)) * pull;
-          yesBtn.style.transform = 'translate(' + nx + 'px,' + ny + 'px) scale(' + baseScale + ')';
-          cursorRing.classList.add('on-yes');
-        } else {
-          yesBtn.style.transform = 'scale(' + baseScale + ')';
-          cursorRing.classList.remove('on-yes');
-        }
-      }
-    });
-
-    yesBtn.addEventListener('mouseenter', function(){ cursorRing.classList.add('on-yes'); });
-    yesBtn.addEventListener('mouseleave', function(){ cursorRing.classList.remove('on-yes'); });
-  }
+  
 
   /* subtle card parallax */
   document.addEventListener('mousemove', function(e){
@@ -843,8 +737,8 @@
 
     document.documentElement.style.setProperty('--warmth', 1);
 
-    // clean up any decoy buttons
-    document.querySelectorAll('.decoy').forEach(function(b){ b.remove(); });
+// clean up any decoy buttons
+document.querySelectorAll('.decoy').forEach(function(b){ b.remove(); });
 
     setTimeout(function(){
       activate(sceneCalendar);
